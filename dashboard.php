@@ -9,14 +9,41 @@ if (!isset($_SESSION['teacher_id'])) {
 
 $teacher_id = $_SESSION['teacher_id'];
 
-// Handle class creation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if ($_POST['action'] === 'create_class') {
-        $class_name = $_POST['class_name'] ?? '';
-        if (!empty($class_name)) {
-            $stmt = $pdo->prepare("INSERT INTO classes (teacher_id, name) VALUES (?, ?)");
-            $stmt->execute([$teacher_id, $class_name]);
+// Handle class creation and deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
+            case 'create_class':
+                $class_name = $_POST['class_name'] ?? '';
+                if (!empty($class_name)) {
+                    $stmt = $pdo->prepare("INSERT INTO classes (teacher_id, name) VALUES (?, ?)");
+                    $stmt->execute([$teacher_id, $class_name]);
+                }
+                break;
+            
+            case 'delete_class':
+                $class_id = $_POST['class_id'] ?? '';
+                if (!empty($class_id)) {
+                    // Verify class belongs to teacher
+                    $stmt = $pdo->prepare("SELECT * FROM classes WHERE id = ? AND teacher_id = ?");
+                    $stmt->execute([$class_id, $teacher_id]);
+                    $class = $stmt->fetch();
+
+                    if ($class) {
+                        // Delete all students in the class first
+                        $stmt = $pdo->prepare("DELETE FROM students WHERE class_id = ?");
+                        $stmt->execute([$class_id]);
+                        
+                        // Then delete the class
+                        $stmt = $pdo->prepare("DELETE FROM classes WHERE id = ?");
+                        $stmt->execute([$class_id]);
+                    }
+                }
+                break;
         }
+        // Redirect to prevent form resubmission
+        header('Location: dashboard.php');
+        exit;
     }
 }
 
@@ -45,8 +72,6 @@ $classes = $stmt->fetchAll();
             </button>
         </header>
 
-
-
         <div class="classes-list">
             <h2>Your Classes</h2>
             <?php if (empty($classes)): ?>
@@ -55,7 +80,16 @@ $classes = $stmt->fetchAll();
                 <div class="classes-grid">
                     <?php foreach ($classes as $class): ?>
                         <div class="class-card">
-                            <h3><?php echo htmlspecialchars($class['name']); ?></h3>
+                            <div class="class-header">
+                                <h3><?php echo htmlspecialchars($class['name']); ?></h3>
+                                <form method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this class? This will also delete all students in this class.');">
+                                    <input type="hidden" name="action" value="delete_class">
+                                    <input type="hidden" name="class_id" value="<?php echo $class['id']; ?>">
+                                    <button type="submit" class="btn btn-small delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                             <div class="class-actions">
                                 <a href="manage_students.php?class_id=<?php echo $class['id']; ?>" class="nav-btn">
                                     <i class="fas fa-user-edit"></i> Edit Class
@@ -80,7 +114,6 @@ $classes = $stmt->fetchAll();
                 <button type="submit">Create Class</button>
             </form>
         </div>
-
     </div>
 </body>
 

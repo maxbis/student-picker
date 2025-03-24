@@ -143,8 +143,15 @@ textarea {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.class-card h3 {
+.class-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 15px;
+}
+
+.class-header h3 {
+    margin: 0;
     color: #2c3e50;
 }
 
@@ -200,8 +207,9 @@ textarea {
 }
 
 .name-display.selected {
-    color: #2ecc71;
+    color: #0ca74d;
     font-weight: bold;
+    font-size: 4em;
     animation: pulse 1s;
 }
 
@@ -389,4 +397,37 @@ textarea {
     .name-display {
         font-size: 2em;
     }
+    .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+}
+
+/* Class card delete button */
+.class-card .delete {
+    background-color: #a36d73;
+    color: white;
+    padding: 6px 12px;
+    font-size: 8px;
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.class-card .delete:hover {
+    background-color: #c82333;
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+}
+
+.class-card .delete:active {
+    background-color: #a71d2a;
+    transform: scale(0.98);
+}
+
+.class-card .delete i {
+    font-size: 14px;
 }

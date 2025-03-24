@@ -134,6 +134,57 @@ $students = $stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Students - <?php echo htmlspecialchars($class['name']); ?></title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .student-name {
+            font-size: 1.1em;
+            /* Adjust to match heading styles */
+            font-weight: 600;
+            color: rgb(6, 65, 124);
+        }
+
+        .student-card {
+            position: relative;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .student-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+
+        .btn-small {
+            margin-top: 3px;
+            margin-right: 3px;
+            padding: 3px 6px;
+            font-size: 9px;
+            background-color: rgb(182, 103, 111);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            line-height: 1;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-small:hover {
+            background-color: #c82333;
+        }
+
+        .btn-small:active {
+            background-color: #a71d2a;
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 
 <body>
@@ -152,22 +203,34 @@ $students = $stmt->fetchAll();
                 <p>No students added yet.</p>
             <?php else: ?>
                 <div class="students-grid" id="students-grid">
+
                     <?php foreach ($students as $student): ?>
                         <div class="student-card <?php echo $student['is_active'] ? 'active' : 'inactive'; ?>" data-student-id="<?php echo $student['id']; ?>">
-                            <h3><?php echo htmlspecialchars($student['name']); ?></h3>
+
+                            <!-- Delete button positioned in top-right corner -->
                             <div class="student-actions">
-                                <button class="btn toggle-status" data-student-id="<?php echo $student['id']; ?>">
-                                    <?php echo $student['is_active'] ? 'Deactivate' : 'Activate'; ?>
+                                <button class="btn btn-small delete" data-student-id="<?php echo $student['id']; ?>"
+                                    style="display: <?php echo $student['is_active'] ? 'none' : 'inline-flex'; ?>;">
+                                    🗙
                                 </button>
-                                <button class="btn delete" data-student-id="<?php echo $student['id']; ?>">
-                                    Delete
-                                </button>
+                            </div>
+
+                            <div class="student-info">
+                                <input
+                                    type="checkbox"
+                                    class="toggle-status"
+                                    data-student-id="<?php echo $student['id']; ?>"
+                                    <?php echo $student['is_active'] ? 'checked' : ''; ?>>
+                                <span class="student-name"><?php echo htmlspecialchars($student['name']); ?></span>
                             </div>
                         </div>
                     <?php endforeach; ?>
+
+
                 </div>
             <?php endif; ?>
         </div>
+
 
         <hr style="margin: 40px 0;">
 
@@ -227,9 +290,39 @@ $students = $stmt->fetchAll();
             }
 
             // Handle toggle status
-            document.querySelectorAll('.toggle-status').forEach(button => {
-                button.addEventListener('click', function() {
+            // document.querySelectorAll('.toggle-status').forEach(button => {
+            //     button.addEventListener('click', function() {
+            //         const studentId = this.dataset.studentId;
+            //         const formData = new FormData();
+            //         formData.append('ajax', 'toggle_status');
+            //         formData.append('student_id', studentId);
+            //         formData.append('class_id', classId);
+            //         console.log(formData);
+
+            //         fetch('manage_students.php', {
+            //                 method: 'POST',
+            //                 body: formData
+            //             })
+            //             .then(response => response.json())
+            //             .then(data => {
+            //                 if (data.success) {
+            //                     const studentCard = this.closest('.student-card');
+            //                     studentCard.classList.toggle('active');
+            //                     studentCard.classList.toggle('inactive');
+            //                     this.textContent = data.button_text;
+            //                 }
+            //             });
+            //     });
+            // });
+
+            // Handle toggle status
+            document.querySelectorAll('.toggle-status').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
                     const studentId = this.dataset.studentId;
+                    const studentCard = this.closest('.student-card');
+                    const studentActions = studentCard.querySelector('.student-actions');
+                    const deleteBtn = studentActions.querySelector('.delete'); // Select the delete button
+
                     const formData = new FormData();
                     formData.append('ajax', 'toggle_status');
                     formData.append('student_id', studentId);
@@ -242,14 +335,24 @@ $students = $stmt->fetchAll();
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                const studentCard = this.closest('.student-card');
                                 studentCard.classList.toggle('active');
                                 studentCard.classList.toggle('inactive');
-                                this.textContent = data.button_text;
+
+                                // Show/hide delete button based on active status
+                                if (deleteBtn) {
+                                    deleteBtn.style.display = data.is_active ? 'none' : 'inline-flex';
+                                }
+                            } else {
+                                console.error('Error toggling student status:', data.message);
                             }
+                        })
+                        .catch(error => {
+                            console.error('AJAX request failed:', error);
                         });
                 });
             });
+
+
 
             // Handle delete student
             document.querySelectorAll('.delete').forEach(button => {
