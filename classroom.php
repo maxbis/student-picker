@@ -141,7 +141,7 @@ try {
 
     <div class="container">
         <header>
-            <h1><?php echo htmlspecialchars($class['name']); ?> - Student Picker</h1>
+            <h1><?php echo htmlspecialchars($class['name']); ?> - Classroom</h1>
             <div class="header-actions">
                 <a href="dashboard.php" class="btn"><i class="fas fa-arrow-left"></i>Dashboard</a>
                 <a href="logout.php" class="logout-btn">Logout</a>

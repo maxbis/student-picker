@@ -31,12 +31,61 @@ $stmt->execute([$class_id]);
 $students = $stmt->fetchAll();
 
 // Handle AJAX request for random student
-if (isset($_GET['ajax']) && $_GET['ajax'] === 'pick') {
-    if (!empty($students)) {
-        $random_student = $students[array_rand($students)];
-        echo json_encode(['success' => true, 'student' => $random_student]);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'No active students found']);
+if (isset($_GET['ajax'])) {
+    if ($_GET['ajax'] === 'pick') {
+        if (!empty($students)) {
+            $random_student = $students[array_rand($students)];
+            echo json_encode(['success' => true, 'student' => $random_student]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No active students found']);
+        }
+    } elseif ($_GET['ajax'] === 'save_selected' && isset($_POST['student_id'])) {
+        header('Content-Type: application/json');
+        
+        $student_id = (int)$_POST['student_id'];
+        error_log("Attempting to save student ID: " . $student_id);
+        error_log("Available students: " . print_r($students, true));
+        
+        // Find the selected student
+        $selected_student = null;
+        foreach ($students as $student) {
+            error_log("Comparing student ID: " . $student['id'] . " (type: " . gettype($student['id']) . ") with " . $student_id . " (type: " . gettype($student_id) . ")");
+            if ((int)$student['id'] === $student_id) {
+                $selected_student = $student;
+                break;
+            }
+        }
+        
+        if ($selected_student) {
+            error_log("Found student: " . print_r($selected_student, true));
+            
+            // Initialize selected students array if not exists
+            if (!isset($_SESSION['selected_students'])) {
+                $_SESSION['selected_students'] = [];
+                error_log("Initialized selected_students array");
+            }
+            
+            // Check if student is already selected
+            $already_selected = false;
+            foreach ($_SESSION['selected_students'] as $student) {
+                if ((int)$student['id'] === $student_id) {
+                    $already_selected = true;
+                    break;
+                }
+            }
+            
+            if (!$already_selected) {
+                $_SESSION['selected_students'][] = $selected_student;
+                error_log("Added student to selected_students. Current session: " . print_r($_SESSION, true));
+                echo json_encode(['success' => true, 'message' => 'Student saved successfully']);
+            } else {
+                error_log("Student already selected");
+                echo json_encode(['success' => true, 'message' => 'Student already selected']);
+            }
+        } else {
+            error_log("Student not found. Looking for ID: " . $student_id);
+            echo json_encode(['success' => false, 'message' => 'Student not found']);
+        }
     }
     exit;
 }
@@ -88,15 +137,54 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
 
         <?php if (!empty($_SESSION['selected_students'])): ?>
             <div class="selected-students">
-                <h3>Previously Selected Students:</h3>
-                <ul>
+                <h3>
+                    <i class="fas fa-chevron-right toggle-icon collapsed"></i>
+                    Previously Selected Students:
+                </h3>
+                <ul id="selected-students-list" class="collapsed">
                     <?php foreach ($_SESSION['selected_students'] as $student): ?>
                         <li><?php echo htmlspecialchars($student['name']); ?></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
+        <?php else: ?>
+            <div class="selected-students">
+                <h3>
+                    <i class="fas fa-chevron-right toggle-icon collapsed"></i>
+                    Previously Selected Students:
+                </h3>
+                <ul id="selected-students-list" class="collapsed"></ul>
+            </div>
         <?php endif; ?>
     </div>
+
+    <style>
+        .selected-students h3 {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            width: 12px;
+        }
+        .toggle-icon.collapsed {
+            transform: rotate(0deg);
+        }
+        .toggle-icon:not(.collapsed) {
+            transform: rotate(90deg);
+        }
+        #selected-students-list {
+            transition: max-height 0.3s ease-out;
+            overflow: hidden;
+            max-height: 0;
+        }
+        #selected-students-list:not(.collapsed) {
+            max-height: 500px;
+        }
+    </style>
 
     <script>
         const students = <?php echo json_encode($students); ?>;
@@ -108,6 +196,14 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
         const nameDisplay = document.getElementById('name-display');
         const pickButton = document.getElementById('pick-button');
         const stopButton = document.getElementById('stop-button');
+        const selectedStudentsList = document.getElementById('selected-students-list');
+
+        // Function to update the selected students list
+        function updateSelectedStudentsList(student) {
+            const li = document.createElement('li');
+            li.textContent = student.name;
+            selectedStudentsList.appendChild(li);
+        }
 
         // Filter out already selected students
         const availableStudents = students.filter(student => 
@@ -167,6 +263,36 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
             nameDisplay.textContent = randomStudent.name;
             nameDisplay.classList.add('selected');
             
+            // Save selected student to session via AJAX
+            fetch('picker.php?ajax=save_selected&class_id=<?php echo $class_id; ?>', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `student_id=${randomStudent.id}`
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Update the selected students list
+                    updateSelectedStudentsList(randomStudent);
+                    // Remove the student from available students
+                    const index = availableStudents.findIndex(s => s.id === randomStudent.id);
+                    if (index > -1) {
+                        availableStudents.splice(index, 1);
+                    }
+                } else {
+                    console.error('Failed to save selected student:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving selected student:', error);
+            });
+            
             // Reset buttons
             pickButton.style.display = 'inline-block';
             stopButton.style.display = 'none';
@@ -179,6 +305,15 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
 
         pickButton.addEventListener('click', startAnimation);
         stopButton.addEventListener('click', stopAnimation);
+
+        // Add toggle functionality for selected students list
+        document.querySelector('.selected-students h3').addEventListener('click', function() {
+            const list = document.getElementById('selected-students-list');
+            const icon = this.querySelector('.toggle-icon');
+            
+            list.classList.toggle('collapsed');
+            icon.classList.toggle('collapsed');
+        });
     </script>
 </body>
 </html> 
