@@ -26,4 +26,4 @@ CREATE TABLE IF NOT EXISTS students (
 );
 
 -- Insert default admin teacher (password: admin123)
-INSERT INTO teachers (username, password) VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'); 
+INSERT INTO teachers (username, password) VALUES ('admin', '$2a$12$7RUcsEfeHdraUAJK3WXvAewG1hmBVr8obGQCMoI0ECvoErH17D/g2'); 
