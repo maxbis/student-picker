@@ -63,19 +63,25 @@ textarea {
 /* Button styles */
 .btn {
     display: inline-flex;
+    background-color: #007bff;
+    color: white;
     align-items: center;
+    min-width: 100px;
     justify-content: center;
     gap: 8px;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: bold;
-    padding: 12px 24px;
+    padding: 6px 12px;
+    margin: 20px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: 5px;
     cursor: pointer;
     text-decoration: none;
     transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
+
+
 
 .btn.primary {
     background-color: #007bff;
@@ -304,14 +310,13 @@ textarea {
 }
 
 /* Navigation buttons */
-.nav-btn, .random-btn {
+.nav-btn, .random-btn, .classroom-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    padding: 12px 24px;
+    font-size: 12px;
+    padding: 6px 12px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -353,12 +358,11 @@ textarea {
 
 /* Logout button */
 .logout-btn {
-    background-color: #d9534f;
+    background-color: #e58480;
     color: white;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
+    padding: 6px 12px;
+    font-size: 12px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
@@ -411,8 +415,8 @@ textarea {
     color: white;
     padding: 6px 12px;
     font-size: 8px;
-    min-width: 36px;
-    height: 36px;
+    min-width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -429,5 +433,19 @@ textarea {
 }
 
 .class-card .delete i {
-    font-size: 14px;
+    font-size: 12px;
+}
+
+.classroom-btn {
+    background-color: #000094;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.classroom-btn:hover {
+    background-color: #45a049;
+}
+
+.classroom-btn i {
+    font-size: 1.1em;
 }

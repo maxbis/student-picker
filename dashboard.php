@@ -67,7 +67,7 @@ $classes = $stmt->fetchAll();
     <div class="container">
         <header>
             <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
-            <button class="logout-btn" onclick="window.location.href='logout.php'">
+            <button class="btn logout-btn" onclick="window.location.href='logout.php'">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </header>
@@ -92,10 +92,13 @@ $classes = $stmt->fetchAll();
                             </div>
                             <div class="class-actions">
                                 <a href="manage_students.php?class_id=<?php echo $class['id']; ?>" class="nav-btn">
-                                    <i class="fas fa-user-edit"></i> Edit Class
+                                    <i class="fas fa-user-edit"></i> Edit
                                 </a>
                                 <a href="picker.php?class_id=<?php echo $class['id']; ?>" class="random-btn">
-                                    <i class="fas fa-random"></i> Pick Student
+                                    <i class="fas fa-random"></i> Picker
+                                </a>
+                                <a href="classroom.php?class_id=<?php echo $class['id']; ?>" class="classroom-btn">
+                                    <i class="fas fa-chalkboard"></i>Layout
                                 </a>
                             </div>
                         </div>

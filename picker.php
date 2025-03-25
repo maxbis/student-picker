@@ -55,13 +55,14 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pick Student - <?php echo htmlspecialchars($class['name']); ?></title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1><?php echo htmlspecialchars($class['name']); ?> - Student Picker</h1>
             <div class="header-actions">
-                <a href="dashboard.php" class="btn">Back to Dashboard</a>
+                <a href="dashboard.php" class="btn"><i class="fas fa-arrow-left"></i>Dashboard</a>
                 <a href="logout.php" class="logout-btn">Logout</a>
             </div>
         </header>
@@ -72,8 +73,8 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
             </div>
             
             <div class="picker-controls">
-                <button id="pick-button" class="btn primary">Pick Random Student</button>
-                <button id="stop-button" class="btn" style="display: none;">Stop</button>
+                <button id="pick-button" class="btn primary" style="font-size:18px;">Start</button>
+                <button id="stop-button" class="btn" style="display: none;font-size:18px;">Stop</button>
             </div>
 
             <?php if (empty($students)): ?>

@@ -25,5 +25,12 @@ CREATE TABLE IF NOT EXISTS students (
     FOREIGN KEY (class_id) REFERENCES classes(id)
 );
 
+CREATE TABLE IF NOT EXISTS student_positions (
+    student_id INT NOT NULL PRIMARY KEY,
+    x INT NOT NULL,
+    y INT NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
 -- Insert default admin teacher (password: admin123)
 INSERT INTO teachers (username, password) VALUES ('admin', '$2a$12$7RUcsEfeHdraUAJK3WXvAewG1hmBVr8obGQCMoI0ECvoErH17D/g2'); 
