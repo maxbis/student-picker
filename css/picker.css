@@ -1,0 +1,30 @@
+.selected-students h3 {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    width: 12px;
+}
+
+.toggle-icon.collapsed {
+    transform: rotate(0deg);
+}
+
+.toggle-icon:not(.collapsed) {
+    transform: rotate(90deg);
+}
+
+#selected-students-list {
+    transition: max-height 0.3s ease-out;
+    overflow: hidden;
+    max-height: 0;
+}
+
+#selected-students-list:not(.collapsed) {
+    max-height: 500px;
+}
