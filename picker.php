@@ -41,11 +41,11 @@ if (isset($_GET['ajax'])) {
         }
     } elseif ($_GET['ajax'] === 'save_selected' && isset($_POST['student_id'])) {
         header('Content-Type: application/json');
-        
+
         $student_id = (int)$_POST['student_id'];
         error_log("Attempting to save student ID: " . $student_id);
         error_log("Available students: " . print_r($students, true));
-        
+
         // Find the selected student
         $selected_student = null;
         foreach ($students as $student) {
@@ -55,16 +55,16 @@ if (isset($_GET['ajax'])) {
                 break;
             }
         }
-        
+
         if ($selected_student) {
             error_log("Found student: " . print_r($selected_student, true));
-            
+
             // Initialize selected students array if not exists
             if (!isset($_SESSION['selected_students'])) {
                 $_SESSION['selected_students'] = [];
                 error_log("Initialized selected_students array");
             }
-            
+
             // Check if student is already selected
             $already_selected = false;
             foreach ($_SESSION['selected_students'] as $student) {
@@ -73,7 +73,7 @@ if (isset($_GET['ajax'])) {
                     break;
                 }
             }
-            
+
             if (!$already_selected) {
                 $_SESSION['selected_students'][] = $selected_student;
                 error_log("Added student to selected_students. Current session: " . print_r($_SESSION, true));
@@ -99,6 +99,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -106,13 +107,17 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1><?php echo htmlspecialchars($class['name']); ?> - Student Picker</h1>
             <div class="header-actions">
-                <a href="dashboard.php" class="btn"><i class="fas fa-arrow-left"></i>Dashboard</a>
-                <a href="logout.php" class="logout-btn">Logout</a>
+                <a href="dashboard.php" class="btn btn-back"><i class="fas fa-arrow-left"></i>Dashboard</a>
+                <span class="divider">&nbsp;|&nbsp;</span>
+                <button class="btn logout-btn" onclick="window.location.href='logout.php'">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </header>
 
@@ -120,10 +125,10 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
             <div id="name-display" class="name-display">
                 <span class="placeholder">Click the button to start</span>
             </div>
-            
+
             <div class="picker-controls">
-                <button id="pick-button" class="btn primary" style="font-size:18px;">Start</button>
-                <button id="stop-button" class="btn" style="display: none;font-size:18px;">Stop</button>
+                <button id="pick-button" class="btn btn-start" style="font-size:18px;">Start</button>
+                <button id="stop-button" class="btn btn-stop" style="display: none;font-size:18px;">Stop</button>
             </div>
 
             <?php if (empty($students)): ?>
@@ -132,7 +137,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
         </div>
 
         <div class="picker-footer">
-            <a href="?class_id=<?php echo $class_id; ?>&reset=true" class="btn btn-small">Reset Selected Students</a>
+            <a href="?class_id=<?php echo $class_id; ?>&reset=true" class="btn btn-reset">Reset Selected Students</a>
         </div>
 
         <?php if (!empty($_SESSION['selected_students'])): ?>
@@ -166,21 +171,26 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
             gap: 10px;
             margin-bottom: 10px;
         }
+
         .toggle-icon {
             transition: transform 0.3s ease;
             width: 12px;
         }
+
         .toggle-icon.collapsed {
             transform: rotate(0deg);
         }
+
         .toggle-icon:not(.collapsed) {
             transform: rotate(90deg);
         }
+
         #selected-students-list {
             transition: max-height 0.3s ease-out;
             overflow: hidden;
             max-height: 0;
         }
+
         #selected-students-list:not(.collapsed) {
             max-height: 500px;
         }
@@ -206,7 +216,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
         }
 
         // Filter out already selected students
-        const availableStudents = students.filter(student => 
+        const availableStudents = students.filter(student =>
             !selectedStudents.some(selected => selected.id === student.id)
         );
 
@@ -221,14 +231,14 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
                 alert('All students have been selected! Click "Reset Selected Students" to start over.');
                 return;
             }
-            
+
             isRunning = true;
             pickButton.style.display = 'none';
             stopButton.style.display = 'inline-block';
-            
+
             // Start with a faster interval
             intervalId = setInterval(updateDisplay, 50);
-            
+
             // Gradually slow down
             let speed = 50;
             const slowDown = setInterval(() => {
@@ -238,7 +248,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
                     intervalId = setInterval(updateDisplay, speed);
                 }
             }, 500);
-            
+
             // Store the slowDown interval ID to clear it later
             stopButton.dataset.slowDownId = slowDown;
 
@@ -252,51 +262,51 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
 
         function stopAnimation() {
             if (!isRunning) return;
-            
+
             isRunning = false;
             clearInterval(intervalId);
             clearInterval(parseInt(stopButton.dataset.slowDownId));
             clearTimeout(autoStopTimeout);
-            
+
             // Pick a random student from available students
             const randomStudent = availableStudents[Math.floor(Math.random() * availableStudents.length)];
             nameDisplay.textContent = randomStudent.name;
             nameDisplay.classList.add('selected');
-            
+
             // Save selected student to session via AJAX
             fetch('picker.php?ajax=save_selected&class_id=<?php echo $class_id; ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `student_id=${randomStudent.id}`
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Response data:', data);
-                if (data.success) {
-                    // Update the selected students list
-                    updateSelectedStudentsList(randomStudent);
-                    // Remove the student from available students
-                    const index = availableStudents.findIndex(s => s.id === randomStudent.id);
-                    if (index > -1) {
-                        availableStudents.splice(index, 1);
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `student_id=${randomStudent.id}`
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        // Update the selected students list
+                        updateSelectedStudentsList(randomStudent);
+                        // Remove the student from available students
+                        const index = availableStudents.findIndex(s => s.id === randomStudent.id);
+                        if (index > -1) {
+                            availableStudents.splice(index, 1);
+                        }
+                    } else {
+                        console.error('Failed to save selected student:', data.message);
                     }
-                } else {
-                    console.error('Failed to save selected student:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error saving selected student:', error);
-            });
-            
+                })
+                .catch(error => {
+                    console.error('Error saving selected student:', error);
+                });
+
             // Reset buttons
             pickButton.style.display = 'inline-block';
             stopButton.style.display = 'none';
-            
+
             // Remove selected class after animation
             setTimeout(() => {
                 nameDisplay.classList.remove('selected');
@@ -310,10 +320,11 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
         document.querySelector('.selected-students h3').addEventListener('click', function() {
             const list = document.getElementById('selected-students-list');
             const icon = this.querySelector('.toggle-icon');
-            
+
             list.classList.toggle('collapsed');
             icon.classList.toggle('collapsed');
         });
     </script>
 </body>
-</html> 
+
+</html>
