@@ -123,7 +123,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
 
         <div class="picker-container">
             <div id="name-display" class="name-display">
-                <span class="placeholder">Click the button to start</span>
+                <span class="placeholder">Click Start Button</span>
             </div>
 
             <div class="picker-controls">
