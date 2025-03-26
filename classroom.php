@@ -143,7 +143,8 @@ try {
         <header>
             <h1><?php echo htmlspecialchars($class['name']); ?> - Classroom</h1>
             <div class="header-actions">
-                <a href="dashboard.php" class="btn"><i class="fas fa-arrow-left"></i>Dashboard</a>
+                <a href="dashboard.php" class="btn btn-back"><i class="fas fa-arrow-left"></i>Dashboard</a>
+                <span class="divider">&nbsp;|&nbsp;</span>
                 <a href="logout.php" class="logout-btn">Logout</a>
             </div>
         </header>
