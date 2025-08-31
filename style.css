@@ -63,6 +63,7 @@ button,
 .nav-btn,
 .random-btn,
 .classroom-btn,
+.groups-btn,
 .logout-btn,
 .create-class button {
     font-family: 'Inter', sans-serif;
@@ -87,6 +88,7 @@ button:hover,
 .nav-btn:hover,
 .random-btn:hover,
 .classroom-btn:hover,
+.groups-btn:hover,
 .logout-btn:hover,
 .create-class button:hover {
     transform: scale(1.03);
@@ -142,6 +144,17 @@ button:hover,
     margin-top: 10px;
 }
 
+.nav-btn,
+.random-btn,
+.classroom-btn,
+.groups-btn {
+    min-width: 110px;
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .nav-btn {
     background-color: #c5e0fd;
     color: rgb(17, 71, 250);
@@ -156,6 +169,12 @@ button:hover,
     background-color: hsl(162, 77%, 86%);
     color: rgb(2, 80, 55);
 }
+
+.groups-btn {
+    background-color: #e8d5f7;
+    color: #6b21a8;
+}
+
 
 .delete {
     background-color: #ffffff;

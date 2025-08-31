@@ -101,6 +101,9 @@ $classes = $stmt->fetchAll();
                                 <a href="classroom.php?class_id=<?php echo $class['id']; ?>" class="classroom-btn">
                                     <i class="fas fa-chalkboard"></i>Layout
                                 </a>
+                                <a href="groups.php?class_id=<?php echo $class['id']; ?>" class="groups-btn">
+                                    <i class="fas fa-users"></i>Groups
+                                </a>
                             </div>
                         </div>
                     <?php endforeach; ?>
