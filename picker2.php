@@ -94,6 +94,7 @@ if (isset($_GET['reset']) && $_GET['reset'] === 'true') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎯 Student Picker 2.0 - <?php echo htmlspecialchars($class['name']); ?></title>
+    <link rel="icon" type="image/png" href="favicon.ico">
     <style>
         * {
             margin: 0;

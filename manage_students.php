@@ -133,6 +133,7 @@ $students = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Students - <?php echo htmlspecialchars($class['name']); ?></title>
+    <link rel="icon" type="image/png" href="favicon.ico">
     <link rel="stylesheet" href="style.css">
     <style>
         .student-name {
